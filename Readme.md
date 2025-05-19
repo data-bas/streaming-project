@@ -17,7 +17,7 @@ flowchart LR
     end
 
     subgraph Processing
-        H[Transformation\n(Flink\nKafka Streams\nFaust)]
+        H[Transformation\nFlink\nKafka Streams\nFaust]
         I[Enriched Topic]
     end
 
