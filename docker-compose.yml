@@ -1,0 +1,17 @@
+services:
+  coinbase-producer:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile_coinbase_producer
+    container_name: coinbase-producer
+    restart: unless-stopped
+
+  reddit-producer:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile_reddit_producer
+    container_name: reddit-producer
+    restart: unless-stopped
+      
+    env_file:
+      - .env
