@@ -13,6 +13,7 @@ RUN pip install --upgrade pip && pip install .
 # Zet PYTHONPATH zodat src importeerbaar is
 ENV PYTHONPATH=/app/src
 ENV PYTHONUNBUFFERED=1
+ENV IN_DOCKER=1
 
 # Start de app
 CMD ["python", "src/reddit_producer/main.py"]

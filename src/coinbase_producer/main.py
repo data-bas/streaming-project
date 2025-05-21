@@ -1,8 +1,13 @@
-from src.coinbase_producer.coinbase_producer import CoinbaseProducer
+import os
+from dotenv import load_dotenv
 
+from src.coinbase_producer.CoinbaseProducer import CoinbaseProducer
+
+
+load_dotenv()
 
 if __name__ == "__main__":
-    symbol = "BTC-USD"
-    coin_base_producer = CoinbaseProducer([symbol])
-    coin_base_producer.run()
+    symbols = [topic for topic in os.environ.get("TOPICS").split(",")]
 
+    coin_base_producer = CoinbaseProducer(symbols)
+    coin_base_producer.run()

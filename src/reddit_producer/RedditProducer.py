@@ -2,14 +2,14 @@ import praw
 from textblob import TextBlob
 from src.interfaces.BaseWebSocketProducer import BaseStreamProducer
 
+
 class RedditProducer(BaseStreamProducer):
     def __init__(self, subreddits, client_id, client_secret):
-        super().__init__()
         self.subreddits = subreddits
         self.reddit = praw.Reddit(
             client_id=client_id,
             client_secret=client_secret,
-            user_agent='sentimentTracker'
+            user_agent="sentimentTracker",
         )
         self.running = False
 
@@ -20,9 +20,9 @@ class RedditProducer(BaseStreamProducer):
     def on_message(self, message):
         sentiment = self.analyze_sentiment(message.body)
         sentiment_label = (
-            "🟢 Positive" if sentiment > 0.1 else
-            "🔴 Negative" if sentiment < -0.1 else
-            "⚪ Neutral"
+            "Positive"
+            if sentiment > 0.1
+            else "Negative" if sentiment < -0.1 else "Neutral"
         )
         print(f"[{sentiment_label}] u/{message.author}: {message.body[:100]}...")
 
@@ -39,8 +39,10 @@ class RedditProducer(BaseStreamProducer):
         self.on_open()
         self.running = True
         try:
-            for comment in self.reddit.subreddit("+".join(self.subreddits)).stream.comments(skip_existing=True):
-                #if "bitcoin" in comment.body.lower():
+            for comment in self.reddit.subreddit(
+                "+".join(self.subreddits)
+            ).stream.comments(skip_existing=True):
+                # if "bitcoin" in comment.body.lower():
                 self.on_message(comment)
         except Exception as e:
             self.on_error(e)
