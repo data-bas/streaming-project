@@ -3,12 +3,13 @@ AVRO_COINBASE_PRODUCER_TICKER_SCHEMA = {
     "name": "Ticker",
     "namespace": "coinbase",
     "fields": [
-        {"name": "type", "type": "string"},
-        {"name": "price", "type": "string"},
-        {"name": "open_24h", "type": "string"},
-        {"name": "volume_24h", "type": "string"},
-        {"name": "high_24h", "type": "string"},
-        {"name": "side", "type": "string"},
-        {"name": "time", "type": "string"}
-    ]
+        {"name": "product_id", "type": ["null", "string"], "default": None},
+        {"name": "type", "type": ["null", "string"], "default": None},
+        {"name": "price", "type": ["null", "string"], "default": None},
+        {"name": "open_24h", "type": ["null", "string"], "default": None},
+        {"name": "volume_24h", "type": ["null", "string"], "default": None},
+        {"name": "high_24h", "type": ["null", "string"], "default": None},
+        {"name": "side", "type": ["null", "string"], "default": None},
+        {"name": "time", "type": ["null", "string"], "default": None},
+    ],
 }
