@@ -2,26 +2,21 @@ import json
 import websocket
 from src.interfaces.BaseStreamProducer import BaseStreamProducer
 from src.generic.KafkaProducer import KafkaProducer
-from src.generic.SchemaRegistryClient import SchemaRegistryClient
-from src.constants.constants import AVRO_COINBASE_PRODUCER_TICKER_SCHEMA
 
 
 class CoinbaseProducer(BaseStreamProducer, KafkaProducer):
     def __init__(self, symbols):
-        KafkaProducer.__init__(self, producer=self, symbols=symbols)
+        KafkaProducer.__init__(
+            self, producer=self, symbols=symbols, application="coinbase"
+        )
 
         self.ws_url = "wss://ws-feed.exchange.coinbase.com"
         self.symbols = symbols
 
-        # self.schema_client = SchemaRegistryClient("http://localhost:8081")
-        # self.avro_schema = self.schema_client.get_or_register_schema(
-        #    subject="coinbase_producer_BTC-USD",
-        #    schema_dict=AVRO_COINBASE_PRODUCER_TICKER_SCHEMA
-        # )
-
     def filter_message(self, data: str) -> dict[str, str]:
 
-        message = {
+        message = { # TODO: Create single point of truth for this, current workflow needs to update constants and this when adding/removing fields.
+            "product_id": data.get("product_id"), 
             "type": data.get("type"),
             "price": data.get("price"),
             "open_24h": data.get("open_24h"),
