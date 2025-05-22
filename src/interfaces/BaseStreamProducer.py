@@ -1,8 +1,7 @@
 from abc import ABC, abstractmethod
 
+
 class BaseStreamProducer(ABC):
-    def __init__(self):
-        pass
 
     @abstractmethod
     def on_message(self, *args, **kwargs):
