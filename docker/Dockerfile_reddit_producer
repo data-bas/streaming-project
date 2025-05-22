@@ -16,4 +16,4 @@ ENV PYTHONUNBUFFERED=1
 ENV IN_DOCKER=1
 
 # Start de app
-CMD ["python", "src/reddit_producer/main.py"]
+CMD ["python", "src/producers/reddit_producer/main.py"]

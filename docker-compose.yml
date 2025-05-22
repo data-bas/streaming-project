@@ -8,17 +8,17 @@ services:
     container_name: coinbase-producer
     restart: unless-stopped
 
-  reddit-producer:
-    depends_on:
-      - broker
-    build:
-      context: .
-      dockerfile: docker/Dockerfile_reddit_producer
-    container_name: reddit-producer
-    restart: unless-stopped
+  # reddit-producer:
+  #   depends_on:
+  #     - broker
+  #   build:
+  #     context: .
+  #     dockerfile: docker/Dockerfile_reddit_producer
+  #   container_name: reddit-producer
+  #   restart: unless-stopped
 
-    env_file:
-      - .env
+  #   env_file:
+  #     - .env
 
   broker:
     image: confluentinc/cp-kafka:7.9.0

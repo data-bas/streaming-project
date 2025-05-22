@@ -1,12 +1,12 @@
 import os
 from dotenv import load_dotenv
 
-from src.reddit_producer.RedditProducer import RedditProducer
+from src.producers.reddit_producer.RedditProducer import RedditProducer
 
 
 load_dotenv()
-if __name__ == "__main__":
 
+if __name__ == "__main__":
     client_id = os.getenv("REDDIT_CLIENT_ID")
     client_secret = os.getenv("REDDIT_CLIENT_SECRET")
     producer = RedditProducer(

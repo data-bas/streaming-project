@@ -1,14 +1,14 @@
 import json
 import websocket
-from src.interfaces.BaseWebSocketProducer import BaseStreamProducer
-from src.generic.KafkaProducer import GenericKafkaProducer
+from src.interfaces.BaseStreamProducer import BaseStreamProducer
+from src.generic.KafkaProducer import KafkaProducer
 from src.generic.SchemaRegistryClient import SchemaRegistryClient
 from src.constants.constants import AVRO_COINBASE_PRODUCER_TICKER_SCHEMA
 
 
-class CoinbaseProducer(BaseStreamProducer, GenericKafkaProducer):
+class CoinbaseProducer(BaseStreamProducer, KafkaProducer):
     def __init__(self, symbols):
-        GenericKafkaProducer.__init__(self, producer=self, symbols=symbols)
+        KafkaProducer.__init__(self, producer=self, symbols=symbols)
 
         self.ws_url = "wss://ws-feed.exchange.coinbase.com"
         self.symbols = symbols

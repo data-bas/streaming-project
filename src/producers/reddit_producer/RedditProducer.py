@@ -1,6 +1,6 @@
 import praw
 from textblob import TextBlob
-from src.interfaces.BaseWebSocketProducer import BaseStreamProducer
+from src.interfaces.BaseStreamProducer import BaseStreamProducer
 
 
 class RedditProducer(BaseStreamProducer):

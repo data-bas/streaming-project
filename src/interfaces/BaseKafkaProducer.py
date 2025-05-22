@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from src.interfaces.BaseWebSocketProducer import BaseStreamProducer
+from src.interfaces.BaseStreamProducer import BaseStreamProducer
 
 
 class BaseKafkaProducer(ABC):
