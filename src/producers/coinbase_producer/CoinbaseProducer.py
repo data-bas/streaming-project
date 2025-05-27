@@ -4,6 +4,7 @@ from src.interfaces.BaseStreamProducer import BaseStreamProducer
 from src.generic.KafkaProducer import KafkaProducer
 from src.constants.Enums import ProducerApplicationEnum
 from src.constants.Dataclass import CoinbaseMessage
+from src.generic.LoggingDecorator import log_method
 
 
 class CoinbaseProducer(BaseStreamProducer, KafkaProducer):
@@ -19,18 +20,12 @@ class CoinbaseProducer(BaseStreamProducer, KafkaProducer):
         self.symbols = symbols
 
     def filter_message(self, data: str) -> dict[str, str]:
-        message = CoinbaseMessage(
-            product_id=data.get("product_id"),
-            type=data.get("type"),
-            price=data.get("price"),
-            open_24h=data.get("open_24h"),
-            volume_24h=data.get("volume_24h"),
-            high_24h=data.get("high_24h"),
-            side=data.get("side"),
-            time=data.get("time"),
-        )
+        fields = CoinbaseMessage.__dataclass_fields__.keys()
+        filtered_data = {k: data.get(k) for k in fields}
+        message = CoinbaseMessage(**filtered_data)
         return message.__dict__
 
+    @log_method("CoinbaseProducer.on_message")
     def on_message(self, ws, message: str) -> None:
         data = json.loads(message)
         product_id = data.get("product_id")
@@ -39,15 +34,18 @@ class CoinbaseProducer(BaseStreamProducer, KafkaProducer):
             key = str(data.get("trade_id"))
             message = self.filter_message(data)
 
-            print(f"Sending message to topic {self.topics[product_id]}: {message}")
+            # print(f"Sending message to topic {self.topics[product_id]}: {message}")
             self.send(topic=self.topics[product_id], key=key, value=message)
 
+    @log_method("CoinbaseProducer.on_error")
     def on_error(self, ws, error: str) -> None:
         print(f"Error: {error}")
 
+    @log_method("CoinbaseProducer.on_close")
     def on_close(self, ws, close_status_code: str, close_msg: str) -> None:
         print(f"Close status code: {close_status_code}, message: {close_msg}")
 
+    @log_method("CoinbaseProducer.on_open")
     def on_open(self, ws):
         subscribe_message = {
             "type": "subscribe",
@@ -55,6 +53,7 @@ class CoinbaseProducer(BaseStreamProducer, KafkaProducer):
         }
         ws.send(json.dumps(subscribe_message))
 
+    @log_method("CoinbaseProducer.run")
     def run(self) -> None:
         self.ws = websocket.WebSocketApp(
             self.ws_url,

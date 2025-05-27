@@ -2,7 +2,7 @@ from confluent_kafka.schema_registry import (
     SchemaRegistryClient as ConfluentSchemaRegistryClient,
 )
 from src.constants.Enums import SerializerEnum
-from src.constants.constants import AVRO_COINBASE_PRODUCER_TICKER_SCHEMA
+from src.constants.Dataclass import CoinbaseMessage
 import json
 
 
@@ -16,12 +16,8 @@ class SchemaRegistryClient:
         self.create_avro_serializer()  # Dataclass implementatie
 
     def create_avro_serializer(self):  # Serializer klassen
-        schema = (
-            AVRO_COINBASE_PRODUCER_TICKER_SCHEMA
-            if self.application == "coinbase"
-            else None
-        )  # TODO: # ENUM implementatie + Dataclass
-        schema_str = json.dumps(schema)
+
+        schema_str = CoinbaseMessage.avro_schema()
         self.avro_serializer = SerializerEnum.AVRO.value(
             self.schema_registry_client,
             schema_str,

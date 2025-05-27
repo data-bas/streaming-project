@@ -1,8 +1,9 @@
 from dataclasses import dataclass
+from dataclasses_avroschema import AvroModel
 
 
 @dataclass
-class CoinbaseMessage:
+class CoinbaseMessage(AvroModel):
     product_id: str
     type: str
     price: str

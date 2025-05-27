@@ -6,6 +6,7 @@ from src.producers.coinbase_producer.CoinbaseProducer import CoinbaseProducer
 
 load_dotenv()
 
+
 def parse_topics() -> argparse.Namespace:
     """Parse a comma-separated string of topics into a list."""
     parser = argparse.ArgumentParser(description="Run Coinbase Producer with topics.")
@@ -14,7 +15,7 @@ def parse_topics() -> argparse.Namespace:
         type=str,
         required=False,
         help="Comma-separated list of topics, e.g. BTC-USD,XRP-USD,ETH-USD",
-        default="BTC-USD,XRP-USD,ETH-USD"
+        default="BTC-USD,XRP-USD,ETH-USD",
     )
     args = parser.parse_args()
 

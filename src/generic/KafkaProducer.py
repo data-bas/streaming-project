@@ -1,6 +1,5 @@
 from confluent_kafka import Producer
 from confluent_kafka.admin import AdminClient, NewTopic
-from src.interfaces.BaseKafkaProducer import BaseKafkaProducer
 from src.interfaces.BaseStreamProducer import BaseStreamProducer
 from src.constants.Enums import ProducerApplicationEnum
 
@@ -12,22 +11,22 @@ from confluent_kafka.serialization import (
 import os
 
 
-class KafkaProducer(BaseKafkaProducer, SchemaRegistryClient):
+class KafkaProducer(SchemaRegistryClient):
     def __init__(
         self,
         producer: BaseStreamProducer,
         symbols: list,
         application: ProducerApplicationEnum,
     ):
-       
         self.application = application
 
         self.check_current_environment()
-        
+
         self.admin_client = AdminClient({"bootstrap.servers": self.bootstrap_servers})
-        self.topics = {}
-        
+
         SchemaRegistryClient.__init__(self, url=self.schema_registry_url)
+
+        self.topics = {}
         self.ensure_topics_exists(producer, symbols)
 
         self.producer = Producer({"bootstrap.servers": self.bootstrap_servers})
