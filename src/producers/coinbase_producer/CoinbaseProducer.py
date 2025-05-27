@@ -2,30 +2,34 @@ import json
 import websocket
 from src.interfaces.BaseStreamProducer import BaseStreamProducer
 from src.generic.KafkaProducer import KafkaProducer
+from src.constants.Enums import ProducerApplicationEnum
+from src.constants.Dataclass import CoinbaseMessage
 
 
 class CoinbaseProducer(BaseStreamProducer, KafkaProducer):
     def __init__(self, symbols):
         KafkaProducer.__init__(
-            self, producer=self, symbols=symbols, application="coinbase"
+            self,
+            producer=self,
+            symbols=symbols,
+            application=ProducerApplicationEnum.COINBASE.value,
         )
 
         self.ws_url = "wss://ws-feed.exchange.coinbase.com"
         self.symbols = symbols
 
     def filter_message(self, data: str) -> dict[str, str]:
-
-        message = { # TODO: Create single point of truth for this, current workflow needs to update constants and this when adding/removing fields.
-            "product_id": data.get("product_id"), 
-            "type": data.get("type"),
-            "price": data.get("price"),
-            "open_24h": data.get("open_24h"),
-            "volume_24h": data.get("volume_24h"),
-            "high_24h": data.get("high_24h"),
-            "side": data.get("side"),
-            "time": data.get("time"),
-        }
-        return message
+        message = CoinbaseMessage(
+            product_id=data.get("product_id"),
+            type=data.get("type"),
+            price=data.get("price"),
+            open_24h=data.get("open_24h"),
+            volume_24h=data.get("volume_24h"),
+            high_24h=data.get("high_24h"),
+            side=data.get("side"),
+            time=data.get("time"),
+        )
+        return message.__dict__
 
     def on_message(self, ws, message: str) -> None:
         data = json.loads(message)

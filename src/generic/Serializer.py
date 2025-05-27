@@ -1,20 +1,19 @@
-from confluent_kafka.schema_registry import (
-    SchemaRegistryClient as ConfluentSchemaRegistryClient,
-)
 from src.constants.Enums import SerializerEnum
-from src.constants.constants import AVRO_COINBASE_PRODUCER_TICKER_SCHEMA
-import json
 
-
-# https://developer.confluent.io/courses/kafka-python/producer-class-with-schemas-hands-on/
-
-
-class SchemaRegistryClient:
-    def __init__(self, url):
-        self.schema_registry_client = ConfluentSchemaRegistryClient({"url": url})
+class Serializer:
+    
+    def __init__(self, serializer_type):
+        self.serializer_type = serializer_type
+        self.serializer = self.get_serializer(serializer_type)
         self.string_serializer = SerializerEnum.STRING.value("utf_8")
-        self.create_avro_serializer()  # Dataclass implementatie
 
+    def get_serializer(self, serializer_type):
+        if serializer_type == SerializerEnum.AVRO:
+            return self.create_avro_serializer()
+        else:
+            raise ValueError(f"Unsupported serializer type: {serializer_type}")
+        
+        
     def create_avro_serializer(self):  # Serializer klassen
         schema = (
             AVRO_COINBASE_PRODUCER_TICKER_SCHEMA
