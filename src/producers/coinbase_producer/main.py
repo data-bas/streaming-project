@@ -25,6 +25,5 @@ def parse_topics() -> argparse.Namespace:
 if __name__ == "__main__":
     args = parse_topics()
     symbols = [topic.strip() for topic in args.topics.split(",") if topic.strip()]
-    print(symbols)
     coin_base_producer = CoinbaseProducer(symbols)
     coin_base_producer.run()

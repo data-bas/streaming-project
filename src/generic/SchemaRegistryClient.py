@@ -11,7 +11,7 @@ class SchemaRegistryClient:
     def __init__(self, url: str):
         self.schema_registry_client = ConfluentSchemaRegistryClient({"url": url})
         self.string_serializer = SerializerEnum.STRING.value("utf_8")
-        
+
         self.create_avro_serializer()
 
     def create_avro_serializer(self):  # TODO: Serializer klassen

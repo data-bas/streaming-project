@@ -17,3 +17,6 @@ Configuratie per topic zoals:
     Discussion:
         Deze optie geeft meer flexibiliteit voor topic-level configuraties, maar aan de andere kant is dat alleen nodig voor num_partitions/replication_factor. Forceren van Avro serialisatie icm
         Schema registry en dataclass geeft betere performance en overzichtelijkheid in de code over structuur van het schema. 
+
+Serializer klasse:
+    Forceren van Avro maakt dit overbodig

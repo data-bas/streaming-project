@@ -10,8 +10,10 @@ from src.generic.LoggingDecorator import log_method
 
 class CoinbaseProducer(BaseStreamProducer, KafkaProducer):
     def __init__(self, symbols):
-        self.message_schema = CoinbaseMessage.avro_schema() # Onoverzichtelijk want wordt pas gebruikt in SchemRegistry, anders doorgeven via KafkaProducer. Kijken naar implementatie met 
-                                                            
+        self.message_schema = (
+            CoinbaseMessage.avro_schema()
+        )  # TODO: Onoverzichtelijk want wordt pas gebruikt in SchemRegistry, anders doorgeven via KafkaProducer.
+
         KafkaProducer.__init__(
             self,
             producer=self,
@@ -43,7 +45,9 @@ class CoinbaseProducer(BaseStreamProducer, KafkaProducer):
         logging.error(f"Error: {error}")  # TODO: Log error appropriately
 
     def on_close(self, ws, close_status_code: str, close_msg: str) -> None:
-        logging.info(f"Close status code: {close_status_code}, message: {close_msg}") # TODO: Log error appropriately
+        logging.info(
+            f"Close status code: {close_status_code}, message: {close_msg}"
+        )  # TODO: Log error appropriately
 
     @log_method("CoinbaseProducer.on_open")
     def on_open(self, ws):
