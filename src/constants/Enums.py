@@ -7,18 +7,15 @@ class ProducerApplicationEnum(Enum):
     """
     Enum for application names.
     """
+
     COINBASE = "coinbase"
     REDDIT = "reddit"
+
 
 class SerializerEnum(Enum):
     """
     Enum for serializer types.
     """
+
     AVRO = AvroSerializer
     STRING = StringSerializer
-
-class CoinbaseTopicEnum(Enum):
-    """
-    Enum for Coinbase topics.
-    """
-    pass

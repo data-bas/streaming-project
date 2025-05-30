@@ -34,7 +34,7 @@ class KafkaProducer(SchemaRegistryClient):
     def check_current_environment(self):
         in_docker = os.environ.get("IN_DOCKER", "0") == "1"
         if in_docker:
-            self.bootstrap_servers = "broker:29092"
+            self.bootstrap_servers = "broker1:29092,broker2:29094"
             self.schema_registry_url = "http://schema-registry:8081"
         else:
             self.bootstrap_servers = "localhost:9092"
@@ -55,7 +55,7 @@ class KafkaProducer(SchemaRegistryClient):
         for symbol in symbols:
             topic = f"{producer}_{symbol}"
             if topic not in topic_metadata.topics:
-                new_topic = [NewTopic(topic, num_partitions=1, replication_factor=1)]
+                new_topic = [NewTopic(topic, num_partitions=4, replication_factor=1)]
                 self.admin_client.create_topics(new_topic)
 
             self.topics[symbol] = topic

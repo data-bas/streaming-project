@@ -1,5 +1,6 @@
 import json
 import websocket
+import logging
 from src.interfaces.BaseStreamProducer import BaseStreamProducer
 from src.generic.KafkaProducer import KafkaProducer
 from src.constants.Enums import ProducerApplicationEnum
@@ -9,6 +10,8 @@ from src.generic.LoggingDecorator import log_method
 
 class CoinbaseProducer(BaseStreamProducer, KafkaProducer):
     def __init__(self, symbols):
+        self.message_schema = CoinbaseMessage.avro_schema() # Onoverzichtelijk want wordt pas gebruikt in SchemRegistry, anders doorgeven via KafkaProducer. Kijken naar implementatie met 
+                                                            
         KafkaProducer.__init__(
             self,
             producer=self,
@@ -34,16 +37,13 @@ class CoinbaseProducer(BaseStreamProducer, KafkaProducer):
             key = str(data.get("trade_id"))
             message = self.filter_message(data)
 
-            # print(f"Sending message to topic {self.topics[product_id]}: {message}")
             self.send(topic=self.topics[product_id], key=key, value=message)
 
-    @log_method("CoinbaseProducer.on_error")
     def on_error(self, ws, error: str) -> None:
-        print(f"Error: {error}")
+        logging.error(f"Error: {error}")  # TODO: Log error appropriately
 
-    @log_method("CoinbaseProducer.on_close")
     def on_close(self, ws, close_status_code: str, close_msg: str) -> None:
-        print(f"Close status code: {close_status_code}, message: {close_msg}")
+        logging.info(f"Close status code: {close_status_code}, message: {close_msg}") # TODO: Log error appropriately
 
     @log_method("CoinbaseProducer.on_open")
     def on_open(self, ws):
