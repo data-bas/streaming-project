@@ -51,6 +51,7 @@ flowchart LR
 
 
 # Optional
+- Producer load balancing/ stres test toevoegen
 - New Producer in Rust
 - Write tests
 - CICD pipeline

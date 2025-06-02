@@ -1,34 +1,22 @@
 from confluent_kafka.schema_registry import (
     SchemaRegistryClient as ConfluentSchemaRegistryClient,
 )
-from confluent_kafka.schema_registry.avro import AvroSchema, AvroSerializer
-from confluent_kafka.schema_registry.error import SchemaRegistryError
-import json
+from src.constants.Enums import SerializerEnum
 
 
 # https://developer.confluent.io/courses/kafka-python/producer-class-with-schemas-hands-on/
 
 
 class SchemaRegistryClient:
-    def __init__(self, url: str = "http://localhost:8081"):
-        self.client = ConfluentSchemaRegistryClient({"url": url})
+    def __init__(self, url: str):
+        self.schema_registry_client = ConfluentSchemaRegistryClient({"url": url})
+        self.string_serializer = SerializerEnum.STRING.value("utf_8")
 
-    def register_schema(self, subject: str, schema_dict: dict) -> int:
+        self.create_avro_serializer()
 
-        schema_id = self.client.register_schema(subject, schema_dict)
-        # schema_id = self.client.register_schema_full_response(subject, schema_dict)
-        print(f"✅ Schema registered with ID: {schema_id}")
-        return schema_id
-
-    def get_or_register_schema(self, subject: str, schema_dict: dict) -> AvroSchema:
-        try:
-            version = self.client.get_latest_version(subject)
-            print(f"✅ Schema found for subject '{subject}'")
-            return AvroSchema(version.schema.schema_str)
-        except SchemaRegistryError as e:
-            if e.http_status_code == 404:
-                print(f"Geen schema gevonden voor subject '{subject}', registreren...")
-                self.register_schema(subject, schema_dict)
-                return AvroSchema(json.dumps(schema_dict))
-            else:
-                raise
+    def create_avro_serializer(self):  # TODO: Serializer klassen
+        self.avro_serializer = SerializerEnum.AVRO.value(
+            self.schema_registry_client,
+            self.message_schema,
+            conf={"auto.register.schemas": True},
+        )

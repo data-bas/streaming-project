@@ -9,7 +9,7 @@ load_dotenv()
 if __name__ == "__main__":
     client_id = os.getenv("REDDIT_CLIENT_ID")
     client_secret = os.getenv("REDDIT_CLIENT_SECRET")
-    producer = RedditProducer(
+    producer = RedditProducer( 
         ["Bitcoin", "CryptoCurrency", "CryptoMarkets", "funny", "AskReddit", "gaming"],
         client_id,
         client_secret,

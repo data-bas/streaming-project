@@ -6,7 +6,6 @@ WORKDIR /app
 # Kopieer alleen wat nodig is voor installatie (betere caching)
 COPY ../pyproject.toml .
 COPY ../src/ ./src
-COPY ../.env .env
 
 # Installeer afhankelijkheden via pip (hatch + pyproject.toml)
 RUN pip install --upgrade pip && pip install .
@@ -16,4 +15,4 @@ ENV PYTHONPATH=/app/src
 ENV PYTHONUNBUFFERED=1
 ENV IN_DOCKER=1
 # Start de app
-CMD ["python", "src/producers/coinbase_producer/main.py"]
+CMD ["python", "src/producers/coinbase_producer/main.py", "--topics", "BTC-USD,XRP-USD,ETH-USD"]

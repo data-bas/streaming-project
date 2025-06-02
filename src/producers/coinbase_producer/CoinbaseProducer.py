@@ -1,37 +1,36 @@
 import json
 import websocket
+import logging
 from src.interfaces.BaseStreamProducer import BaseStreamProducer
 from src.generic.KafkaProducer import KafkaProducer
-from src.generic.SchemaRegistryClient import SchemaRegistryClient
-from src.constants.constants import AVRO_COINBASE_PRODUCER_TICKER_SCHEMA
+from src.constants.Enums import ProducerApplicationEnum
+from src.constants.Dataclass import CoinbaseMessage
+from src.generic.LoggingDecorator import log_method
 
 
 class CoinbaseProducer(BaseStreamProducer, KafkaProducer):
     def __init__(self, symbols):
-        KafkaProducer.__init__(self, producer=self, symbols=symbols)
+        self.message_schema = (
+            CoinbaseMessage.avro_schema()
+        )  # TODO: Onoverzichtelijk want wordt pas gebruikt in SchemRegistry, anders doorgeven via KafkaProducer.
+
+        KafkaProducer.__init__(
+            self,
+            producer=self,
+            symbols=symbols,
+            application=ProducerApplicationEnum.COINBASE.value,
+        )
 
         self.ws_url = "wss://ws-feed.exchange.coinbase.com"
         self.symbols = symbols
 
-        # self.schema_client = SchemaRegistryClient("http://localhost:8081")
-        # self.avro_schema = self.schema_client.get_or_register_schema(
-        #    subject="coinbase_producer_BTC-USD",
-        #    schema_dict=AVRO_COINBASE_PRODUCER_TICKER_SCHEMA
-        # )
-
     def filter_message(self, data: str) -> dict[str, str]:
+        fields = CoinbaseMessage.__dataclass_fields__.keys()
+        filtered_data = {k: data.get(k) for k in fields}
+        message = CoinbaseMessage(**filtered_data)
+        return message.__dict__
 
-        message = {
-            "type": data.get("type"),
-            "price": data.get("price"),
-            "open_24h": data.get("open_24h"),
-            "volume_24h": data.get("volume_24h"),
-            "high_24h": data.get("high_24h"),
-            "side": data.get("side"),
-            "time": data.get("time"),
-        }
-        return message
-
+    @log_method("CoinbaseProducer.on_message")
     def on_message(self, ws, message: str) -> None:
         data = json.loads(message)
         product_id = data.get("product_id")
@@ -40,15 +39,17 @@ class CoinbaseProducer(BaseStreamProducer, KafkaProducer):
             key = str(data.get("trade_id"))
             message = self.filter_message(data)
 
-            print(f"Sending message to topic {self.topics[product_id]}: {message}")
             self.send(topic=self.topics[product_id], key=key, value=message)
 
     def on_error(self, ws, error: str) -> None:
-        print(f"Error: {error}")
+        logging.error(f"Error: {error}")  # TODO: Log error appropriately
 
     def on_close(self, ws, close_status_code: str, close_msg: str) -> None:
-        print(f"Close status code: {close_status_code}, message: {close_msg}")
+        logging.info(
+            f"Close status code: {close_status_code}, message: {close_msg}"
+        )  # TODO: Log error appropriately
 
+    @log_method("CoinbaseProducer.on_open")
     def on_open(self, ws):
         subscribe_message = {
             "type": "subscribe",
@@ -56,6 +57,7 @@ class CoinbaseProducer(BaseStreamProducer, KafkaProducer):
         }
         ws.send(json.dumps(subscribe_message))
 
+    @log_method("CoinbaseProducer.run")
     def run(self) -> None:
         self.ws = websocket.WebSocketApp(
             self.ws_url,
