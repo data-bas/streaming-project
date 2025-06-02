@@ -1,21 +1,25 @@
 services:
-  # coinbase-producer:
-  #   depends_on:
-  #     - rest-proxy
-  #   build:
-  #     context: .
-  #     dockerfile: docker/Dockerfile_coinbase_producer
-  #   container_name: coinbase-producer
-  #   restart: unless-stopped
+  coinbase-producer:
+    depends_on:
+      - broker1
+      - broker2
+    build:
+      context: .
+      dockerfile: docker/Dockerfile_coinbase_producer
+    container_name: coinbase-producer
+    restart: unless-stopped
 
-  # reddit-producer:
-  #   depends_on:
-  #     - broker
-  #   build:
-  #     context: .
-  #     dockerfile: docker/Dockerfile_reddit_producer
-  #   container_name: reddit-producer
-  #   restart: unless-stopped
+  reddit-producer:
+    depends_on:
+      - broker1
+      - broker2
+    env_file:
+      - Reddit.env
+    build:
+      context: .
+      dockerfile: docker/Dockerfile_reddit_producer
+    container_name: reddit-producer
+    restart: unless-stopped
 
   broker1:
     image: confluentinc/cp-server:7.9.0

@@ -12,3 +12,12 @@ class CoinbaseMessage(AvroModel):
     high_24h: str
     side: str
     time: str
+
+
+@dataclass
+class RedditMessage(AvroModel):
+    id: str
+    topic: str
+    sentiment: str
+    user: str
+    message: str

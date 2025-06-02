@@ -42,20 +42,21 @@ flowchart LR
     J --> K
 ```
 # TODO
-- Implement Schema registry 
-- Functioning Reddit Producer
+- Implement Schema registry V
+- Functioning Reddit Producer V
 - Flink Transformation in Java
 - Create enriched topics
 - Send enriched topics to Apache Pinot
 - Create dashboard in ???
+- Producer load balancing / Add stress test (Java or Rust)
+- Based on stress test -> investigate Cloud alternatives for existing services and implement those or optimize Kafka/Flink
 
 
 # Optional
-- Producer load balancing/ stres test toevoegen
-- New Producer in Rust
+- New Producer in Java/Rust
 - Write tests
+- .whl implementation for Python producers
 - CICD pipeline
-- optimise Kafka performance
 
 ## Project Overview
 
