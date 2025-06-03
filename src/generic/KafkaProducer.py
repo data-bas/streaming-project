@@ -85,7 +85,9 @@ class KafkaProducer(SchemaRegistryClient):
         for suffix in topic_suffix:
             topic = f"{topic_prefix}_{suffix}"
             if topic not in topic_metadata.topics:
-                new_topic = [NewTopic(topic, num_partitions=1, replication_factor=1)]
+                new_topic = [
+                    NewTopic(topic, num_partitions=1, replication_factor=1)
+                ]  # TODO: topic configuration should be configurable, see remarks.txt
                 self.admin_client.create_topics(new_topic)
 
             self.topics[suffix] = topic
