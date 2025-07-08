@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod
 
 
 class BaseStreamProducer(ABC):
-
     @abstractmethod
     def on_message(self, *args, **kwargs):
         pass

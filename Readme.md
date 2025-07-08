@@ -17,7 +17,7 @@ flowchart LR
     end
 
     subgraph Processing
-        H[Transformation\nFlink\nKafka Streams\nFaust]
+        H[Transformation\nFlink]
         I[Enriched Topic]
     end
 
@@ -42,23 +42,25 @@ flowchart LR
     J --> K
 ```
 # TODO
-- Implement Schema registry 
-- Functioning Reddit Producer
+- Implement Schema registry V
+- Functioning Reddit Producer V
 - Flink Transformation in Java
 - Create enriched topics
 - Send enriched topics to Apache Pinot
 - Create dashboard in ???
+- Producer load balancing / Add stress test (Java or Rust) or Ksql datagen
+- Based on stress test -> investigate Cloud alternatives for existing services and implement those or optimize Kafka/Flink
 
 
 # Optional
-- New Producer in Rust
+- New Producer in Java/Rust
 - Write tests
+- .whl implementation for Python producers
 - CICD pipeline
-- optimise Kafka performance
 
 ## Project Overview
 
-This project implements a real-time data streaming pipeline that ingests financial data from multiple sources, processes it, and visualizes the results on a dashboard. The architecture leverages modern streaming and analytics technologies to ensure scalability, reliability, and low-latency insights.
+This project implements a real-time data streaming pipeline that ingests financial related data from multiple sources, processes it, and visualizes the results on a dashboard. The architecture leverages modern streaming and analytics technologies to ensure scalability, reliability, and low-latency insights.
 
 Project uses Confluent platform in Docker. 
 
