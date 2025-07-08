@@ -62,7 +62,6 @@ class RedditProducer(BaseStreamProducer, KafkaProducer):
         )
         return sentiment_label
 
-    @log_method("RedditProducer.on_message")
     def on_message(self, message) -> None:
         """
         Handle incoming Reddit comment, analyze sentiment, and produce to Kafka.
@@ -86,7 +85,7 @@ class RedditProducer(BaseStreamProducer, KafkaProducer):
         )
         
         # Filter the message using the dataclass
-        filtered_message = self.filter_message(RedditMessage, reddit_message.__dict__)
+        filtered_message = self.filter_message(RedditMessage, reddit_message.__dict__, topic=self.topics.get(reddit_message.subreddit))
         
         if reddit_message.subreddit in self.topics.keys():
             key = filtered_message["id"]
@@ -95,7 +94,7 @@ class RedditProducer(BaseStreamProducer, KafkaProducer):
                 key=key,
                 value=filtered_message,
             )
-
+    @log_method("Error occurred in Reddit stream")
     def on_error(self, error: Exception) -> None:
         """
         Handle errors during Reddit streaming.
@@ -105,6 +104,7 @@ class RedditProducer(BaseStreamProducer, KafkaProducer):
         """
         logging.error(f"Reddit Error: {error}")
 
+    @log_method("Connection closed")
     def on_close(self) -> None:
         """
         Handle Reddit stream closure event.
@@ -116,8 +116,7 @@ class RedditProducer(BaseStreamProducer, KafkaProducer):
         Handle Reddit stream open event.
         """
         logging.info("Starting live Reddit stream for Bitcoin-related comments...")
-
-    @log_method("RedditProducer.run")
+    @log_method("Starting Reddit stream")
     def run(self) -> None:
         """
         Start streaming Reddit comments and producing them to Kafka.

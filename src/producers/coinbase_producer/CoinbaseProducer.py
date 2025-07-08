@@ -32,7 +32,6 @@ class CoinbaseProducer(BaseStreamProducer, KafkaProducer):
         self.ws_url = "wss://ws-feed.exchange.coinbase.com"
         self.topic_suffix = topic_suffix
 
-    @log_method("CoinbaseProducer.on_message")
     def on_message(self, ws: websocket.WebSocketApp, message: str) -> None:
         """
         Handle incoming WebSocket messages and produce them to Kafka.
@@ -46,10 +45,11 @@ class CoinbaseProducer(BaseStreamProducer, KafkaProducer):
 
         if product_id in self.topics.keys():
             key = str(data.get("trade_id"))
-            message = self.filter_message(CoinbaseMessage, data)
+            message = self.filter_message(CoinbaseMessage, data, topic=self.topics[product_id])
 
             self.send(topic=self.topics[product_id], key=key, value=message)
-
+            
+    @log_method("Error occurred in Coinbase stream")
     def on_error(self, ws: websocket.WebSocketApp, error: str) -> None:
         """
         Handle WebSocket errors.
@@ -60,6 +60,7 @@ class CoinbaseProducer(BaseStreamProducer, KafkaProducer):
         """
         logging.error(f"Error: {error}")  # TODO: Log error appropriately
 
+    @log_method("Connection closed")
     def on_close(
         self, ws: websocket.WebSocketApp, close_status_code: str, close_msg: str
     ) -> None:
@@ -75,7 +76,7 @@ class CoinbaseProducer(BaseStreamProducer, KafkaProducer):
             f"Close status code: {close_status_code}, message: {close_msg}"
         )  # TODO: Log error appropriately
 
-    @log_method("CoinbaseProducer.on_open")
+    @log_method("WebSocket connection opened - subscribing to channels")
     def on_open(self, ws: websocket.WebSocketApp) -> None:
         """
         Handle WebSocket open event and subscribe to product channels.
@@ -89,7 +90,7 @@ class CoinbaseProducer(BaseStreamProducer, KafkaProducer):
         }
         ws.send(json.dumps(subscribe_message))
 
-    @log_method("CoinbaseProducer.run")
+    @log_method("Starting Coinbase stream")
     def run(self) -> None:
         """
         Start the WebSocket client and begin streaming data from Coinbase.

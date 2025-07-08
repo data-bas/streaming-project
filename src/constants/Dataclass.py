@@ -8,7 +8,7 @@ class LogMessage:
     level: str
     application: Optional[str]
     topic: Optional[str]
-    method: str
+    method: Optional[str]
     message: Optional[str]
     data: Optional[str]  # JSON string representation of data
 

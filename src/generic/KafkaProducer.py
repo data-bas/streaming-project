@@ -3,6 +3,7 @@ from confluent_kafka.admin import AdminClient, NewTopic
 from src.constants.Enums import ProducerApplicationEnum
 
 from src.generic.SchemaRegistryClient import SchemaRegistryClient
+from src.generic.LoggingDecorator import log_filtered_message
 from confluent_kafka.serialization import (
     SerializationContext,
     MessageField,
@@ -92,8 +93,9 @@ class KafkaProducer(SchemaRegistryClient):
 
             self.topics[suffix] = topic
 
+    @log_filtered_message()
     def filter_message(
-        self, dataclass_schema: Type[dataclass], data: Dict[str, Any]
+        self, dataclass_schema: Type[dataclass], data: Dict[str, Any], topic: str = None
     ) -> Dict[str, Any]:
         """
         Filter a dictionary to match the fields of a dataclass schema.
@@ -101,6 +103,7 @@ class KafkaProducer(SchemaRegistryClient):
         Args:
             dataclass_schema (Type[dataclass]): The dataclass type to filter against.
             data (Dict[str, Any]): The input data dictionary.
+            topic (str): The topic name for logging purposes.
 
         Returns:
             Dict[str, Any]: Filtered dictionary matching the dataclass fields.
