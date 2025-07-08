@@ -1,8 +1,57 @@
 import logging
+import json
+from src.constants.Enums import ProducerApplicationEnum
+from src.constants.Dataclass import LogMessage, CoinbaseMessage, RedditMessage
 from functools import wraps
 
 # Configure root logger if not already configured
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+
+
+def _parse_coinbase_message(message_json_string: str) -> CoinbaseMessage:
+    """Parse Coinbase JSON string into CoinbaseInputMessage dataclass"""
+    try:
+        data = json.loads(message_json_string)
+        return CoinbaseMessage(
+            product_id=data.get("product_id", ""),
+            type=data.get("type", ""),
+            price=data.get("price", ""),
+            open_24h=data.get("open_24h", ""),
+            volume_24h=data.get("volume_24h", ""),
+            high_24h=data.get("high_24h", ""),
+            side=data.get("side", ""),
+            time=data.get("time", "")
+        )
+    except (json.JSONDecodeError, Exception):
+        return CoinbaseMessage(
+            product_id="",
+            type="",
+            price="",
+            open_24h="",
+            volume_24h="",
+            high_24h="",
+            side="",
+            time=""
+        )
+
+
+def _parse_reddit_message(praw_comment) -> RedditMessage:
+    """Parse PRAW comment object into RedditInputMessage dataclass"""
+    try:
+        return RedditMessage(
+            id=getattr(praw_comment, "id", None),
+            subreddit=getattr(praw_comment.subreddit, "display_name", None) 
+                if hasattr(praw_comment, "subreddit") else None,
+            author=getattr(praw_comment.author, "name", None) 
+                if hasattr(praw_comment, "author") and praw_comment.author else None,
+            body=getattr(praw_comment, "body", None),
+            created_utc=getattr(praw_comment, "created_utc", None),
+            score=getattr(praw_comment, "score", None),
+            parent_id=getattr(praw_comment, "parent_id", None),
+            link_id=getattr(praw_comment, "link_id", None)
+        )
+    except Exception:
+        return RedditMessage()
 
 
 def _extract_on_message_info(producer_instance, args, app):
@@ -14,45 +63,31 @@ def _extract_on_message_info(producer_instance, args, app):
     data = None
 
     try:
-        if app == "coinbase":
+        if app == ProducerApplicationEnum.COINBASE.value:
             # Coinbase: args = (ws, message_json_string)
             if len(args) >= 2:
-                import json
-
-                data = json.loads(args[1])
-                product_id = data.get("product_id")
+                # Parse into structured dataclass
+                coinbase_msg = _parse_coinbase_message(args[1])
+                data = coinbase_msg
+                
                 if (
                     hasattr(producer_instance, "topics")
-                    and product_id in producer_instance.topics
+                    and coinbase_msg.product_id in producer_instance.topics
                 ):
-                    topic = producer_instance.topics[product_id]
+                    topic = producer_instance.topics[coinbase_msg.product_id]
 
-        elif app == "reddit":
+        elif app == ProducerApplicationEnum.REDDIT.value:
             # Reddit: args = (praw_comment_object,)
             if len(args) >= 1:
-                message = args[0]
-                # Extract subreddit name from PRAW comment object
-                if hasattr(message, "subreddit") and hasattr(
-                    message.subreddit, "display_name"
+                # Parse into structured dataclass
+                reddit_msg = _parse_reddit_message(args[0])
+                data = reddit_msg
+                
+                if (
+                    hasattr(producer_instance, "topics")
+                    and reddit_msg.subreddit in producer_instance.topics
                 ):
-                    subreddit_name = message.subreddit.display_name
-                    if (
-                        hasattr(producer_instance, "topics")
-                        and subreddit_name in producer_instance.topics
-                    ):
-                        topic = producer_instance.topics[subreddit_name]
-                    # Create a summary of the data for logging
-                    data = {
-                        "id": getattr(message, "id", None),
-                        "subreddit": subreddit_name,
-                        "author": getattr(message.author, "name", None)
-                        if hasattr(message, "author") and message.author
-                        else None,
-                        "body_preview": getattr(message, "body", "")[:100] + "..."
-                        if hasattr(message, "body")
-                        and len(getattr(message, "body", "")) > 100
-                        else getattr(message, "body", ""),
-                    }
+                    topic = producer_instance.topics[reddit_msg.subreddit]
 
         # For other producer types, you can add additional elif blocks here
         else:
@@ -100,7 +135,18 @@ def log_method(message=None):
                     if args[0] in self.topics.values():
                         topic = args[0]
 
-            log_msg = f"[app={app}] [topic={topic}] data={data}"
+            # Create structured log message
+            log_message = LogMessage(
+                level="INFO",
+                application=app,
+                topic=topic,
+                method=func.__name__,
+                message=message,
+                data=json.dumps(data.__dict__) if hasattr(data, '__dict__') else json.dumps(data) if data else None
+            )
+            
+            # Log the structured message
+            log_msg = f"[app={log_message.application}] [topic={log_message.topic}] [method={log_message.method}] data={log_message.data}"
             logging.info(log_msg)
             return func(self, *args, **kwargs)
 

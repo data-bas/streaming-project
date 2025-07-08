@@ -5,7 +5,7 @@ import argparse
 from src.producers.reddit_producer.RedditProducer import RedditProducer
 
 
-load_dotenv()
+load_dotenv(dotenv_path='Reddit.env')
 
 
 def parse_subreddits() -> argparse.Namespace:

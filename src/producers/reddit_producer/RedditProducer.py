@@ -70,18 +70,28 @@ class RedditProducer(BaseStreamProducer, KafkaProducer):
         Args:
             message: Reddit comment object.
         """
-        data = {}
         sentiment_label = self.analyze_sentiment(message.body)
-        data["id"] = str(message.id)
-        data["topic"] = message.subreddit.display_name
-        data["sentiment"] = sentiment_label
-        data["user"] = message.author.name
-        data["message"] = message.body
-        filtered_message = self.filter_message(RedditMessage, data)
-        if data["topic"] in self.topics.keys():
+        
+        # Create RedditMessage dataclass instance
+        reddit_message = RedditMessage(
+            id=str(message.id),
+            subreddit=message.subreddit.display_name,
+            author=message.author.name if message.author else None,
+            body=message.body,
+            sentiment=sentiment_label,
+            created_utc=message.created_utc,
+            score=message.score,
+            parent_id=message.parent_id,
+            link_id=message.link_id
+        )
+        
+        # Filter the message using the dataclass
+        filtered_message = self.filter_message(RedditMessage, reddit_message.__dict__)
+        
+        if reddit_message.subreddit in self.topics.keys():
             key = filtered_message["id"]
             self.send(
-                topic=self.topics[filtered_message["topic"]],
+                topic=self.topics[reddit_message.subreddit],
                 key=key,
                 value=filtered_message,
             )
