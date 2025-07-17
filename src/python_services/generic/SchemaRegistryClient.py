@@ -1,7 +1,7 @@
 from confluent_kafka.schema_registry import (
     SchemaRegistryClient as ConfluentSchemaRegistryClient,
 )
-from src.constants.Enums import SerializerEnum
+from src.python_services.constants.Enums import SerializerEnum
 
 
 class SchemaRegistryClient:
