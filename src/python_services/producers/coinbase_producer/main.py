@@ -1,7 +1,7 @@
 import argparse
 from dotenv import load_dotenv
 
-from src.producers.coinbase_producer.CoinbaseProducer import CoinbaseProducer
+from src.python_services.producers.coinbase_producer.CoinbaseProducer import CoinbaseProducer
 
 
 load_dotenv()

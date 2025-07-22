@@ -1,9 +1,9 @@
 from confluent_kafka import Producer
 from confluent_kafka.admin import AdminClient, NewTopic
-from src.constants.Enums import ProducerApplicationEnum
+from src.python_services.constants.Enums import ProducerApplicationEnum
 
-from src.generic.SchemaRegistryClient import SchemaRegistryClient
-from src.generic.LoggingDecorator import log_filtered_message
+from src.python_services.generic.SchemaRegistryClient import SchemaRegistryClient
+from src.python_services.generic.LoggingDecorator import log_filtered_message
 from confluent_kafka.serialization import (
     SerializationContext,
     MessageField,

@@ -1,19 +1,42 @@
-FROM python:3.12-slim
+# Multi-stage build for Reddit Producer
+FROM python:3.12-slim AS builder
 
-# Zet werkdirectory
+# Install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
+
+# Set working directory
 WORKDIR /app
 
-# Kopieer alleen wat nodig is voor installatie (betere caching)
-COPY ../pyproject.toml .
-COPY ../src/ ./src
+# Copy dependency files
+COPY pyproject.toml uv.lock ./
 
-# Installeer afhankelijkheden via pip (hatch + pyproject.toml)
-RUN pip install --upgrade pip && pip install .
+# Install dependencies
+RUN uv sync --frozen --no-dev
 
-# Zet PYTHONPATH zodat src importeerbaar is
-ENV PYTHONPATH=/app/src
+# Production stage
+FROM python:3.12-slim AS runtime
+
+# Install uv in runtime stage
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
+
+# Set working directory
+WORKDIR /app
+
+# Copy the virtual environment from builder stage
+COPY --from=builder /app/.venv /app/.venv
+
+# Copy source code and configuration
+COPY src/ ./src/
+COPY pyproject.toml uv.lock ./
+COPY Reddit.env ./
+
+# Set environment variables
 ENV PYTHONUNBUFFERED=1
 ENV IN_DOCKER=1
+ENV PATH="/app/.venv/bin:$PATH"
 
-# Start de app
-CMD ["python", "src/producers/reddit_producer/main.py", "--subreddits", "Bitcoin,CryptoCurrency,CryptoMarkets,funny,AskReddit,gaming"]
+# Install the package in editable mode
+RUN uv sync --frozen --no-dev
+
+# Start the app using uv
+CMD ["uv", "run", "python", "src/python_services/producers/reddit_producer/main.py", "--subreddits", "Bitcoin,CryptoCurrency,CryptoMarkets,funny,AskReddit,gaming"]

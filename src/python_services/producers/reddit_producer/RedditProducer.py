@@ -1,11 +1,11 @@
 import praw
 import logging
 from textblob import TextBlob
-from src.interfaces.BaseStreamProducer import BaseStreamProducer
-from src.constants.Dataclass import RedditMessage
-from src.constants.Enums import ProducerApplicationEnum
-from src.generic.KafkaProducer import KafkaProducer
-from src.generic.LoggingDecorator import log_method
+from src.python_services.interfaces.BaseStreamProducer import BaseStreamProducer
+from src.python_services.constants.Dataclass import RedditMessage
+from src.python_services.constants.Enums import ProducerApplicationEnum
+from src.python_services.generic.KafkaProducer import KafkaProducer
+from src.python_services.generic.LoggingDecorator import log_method
 from typing import List
 
 

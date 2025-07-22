@@ -1,6 +1,6 @@
 import logging
 import json
-from src.constants.Dataclass import LogMessage
+from src.python_services.constants.Dataclass import LogMessage
 from functools import wraps
 
 # Configure root logger if not already configured

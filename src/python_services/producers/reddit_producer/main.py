@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 import argparse
 
-from src.producers.reddit_producer.RedditProducer import RedditProducer
+from src.python_services.producers.reddit_producer.RedditProducer import RedditProducer
 
 
 load_dotenv(dotenv_path='Reddit.env')
